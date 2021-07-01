@@ -1,0 +1,28 @@
+model
+{
+
+  # Likelihood - in JAGS, normal distribution is parameterized by
+  # mean theta and precision = tau2 = 1/sig2
+  for(i in 1:n){
+  	Y[i] ~ dnorm(mu[i],tau2)
+        mu[i] = alpha[Team[i]]+beta[1]+beta[2]*HR9[i]+beta[3]*BABIP[i]+beta[4]*LOB[i]+beta[5]*WAR[i]+beta[6]*KBB[i] + beta[7]*WHIP[i] + beta[8]*WIN[i]
+  }
+
+  # Priors
+  for(i in 1:p){
+        beta[i] ~ dnorm(0,1e-10)
+  }
+ 
+  for(j in 1:n.teams){
+        alpha[j] ~ dnorm(0,tau2.alpha)
+  }
+
+  tau2 ~ dgamma(0.01,0.01)
+  tau2.alpha~ dgamma(0.01,0.01)
+
+  # Need to have model calculate sig2 = 1/tau2
+  sig2 = 1/tau2
+  sig2.alpha = 1/tau2.alpha
+  icc = sig2.alpha/(sig2+sig2.alpha)
+
+}
